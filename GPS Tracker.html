@@ -24,32 +24,50 @@
 </head>
 
 <body>
+	
 	<div id="map">	
+		<!--
 		<div style="z-index: 999; position:absolute; bottom: 0; left: 0; width: 33%" id="chart"></div>
-		<button onclick="findGPS()" style="z-index: 999; position: absolute; bottom: 27.5%;margin-left: 4.5%">Locate Rocket</button>
+		<button onclick="findGPS()" style="z-index: 999; position: absolute; bottom: 32.5%;margin-left: 4.5%">Locate Rocket</button>
+		-->	
 	</div>
-
 </body>
 <!-- leaflet javascript  -->
 <script src="leaflet.js"></script>
 <!-- plotly javascript  -->
 <script src="plotly-2.12.1.min.js"></script>
 	<script>
+		window.onload = function() {
+			try {
+				var url_string = (window.location.href).toLowerCase();
+				var url = new URL(url_string);
+				let lat = url.searchParams.get("lat");
+				let long = url.searchParams.get("long");
+				let acc = url.searchParams.get("acc");
+        		//console.log(lat+ " and "+long+ " and "+acc);
+						
+				setInterval(() => {
+					graph(lat,long,acc)
+					}, 100);
+				
+			} catch (err) {
+				//console.log("Issues with Parsing URL Parameter's - " + err);
+			}
+}
+		
 		//init map with a position
-		let testlat = 43.4643
-		let testLong = -80.5204
+		//let testlat = 43.4643
+		//let testLong = -80.5204
 
 		var map = L.map('map').setView([43.2557, -79.8711], 10);
 		L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom: 19,attribution: '© OpenStreetMap'}).addTo(map);
 		
-		setInterval(() => {
-			graph(testlat,testLong,10)
-		}, 100);
 
-		setInterval(()=>{
-			testlat-=0.00001
-			testLong-=0.00001
-		}, 100);
+
+		//setInterval(()=>{
+			//testlat-=0.00001
+			//testLong-=0.00001
+		//}, 100);
 		// if(!navigator.geolocation){
 		// 	console.log("Browser doesn't support geolocation")
 		// 	setInterval(() => {
@@ -120,7 +138,6 @@
                 cnt++;
                 if(cnt > 500) {Plotly.relayout('chart',{xaxis: {range: [cnt-500,cnt],title: {text: 'Time(ms)',font: {family: 'Courier New, monospace',size: 16,color: '#7f7f7f'}}}});}},10);
 	</script>
-	
 <script src="plotly.min.js"></script>
 
 </html>

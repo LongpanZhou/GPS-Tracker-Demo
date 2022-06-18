@@ -1,0 +1,88 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>GPS Tracker</title>
+	 
+	<!-- leaflet css  -->
+     <link rel="stylesheet" href="leaflet.css"/>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        #map {
+            width: 100%;
+            height: 100vh;
+			position: relative;
+        }     
+}
+    </style>
+</head>
+
+<body>
+	<div id="map"></div>
+</body>
+<!-- leaflet javascript  -->
+<script src="leaflet.js"></script>
+<!-- plotly javascript  -->
+<script src="plotly-2.12.1.min.js"></script>
+	<script>
+		window.onload = function() {
+			try {
+				var url_string = (window.location.href).toLowerCase();
+				var url = new URL(url_string);
+				let lat = url.searchParams.get("lat");
+				let long = url.searchParams.get("long");
+				let acc = url.searchParams.get("acc");
+        		//console.log(lat+ " and "+long+ " and "+acc);
+						
+				setInterval(() => {
+					graph(lat,long,acc)
+					}, 100);
+				
+			} catch (err) {
+				//console.log("Issues with Parsing URL Parameter's - " + err);
+			}
+}
+
+		var map = L.map('map').setView([43.2557, -79.8711], 10);
+		L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom: 19,attribution: '© OpenStreetMap'}).addTo(map);
+		
+		var GPSMarker, GPSCircle, GPSGroup;
+		
+		function getPosition(position){
+			console.log(position)
+			var lat = position.coords.latitude
+			var long = position.coords.longitude
+			var accuracy = position.coords.accuracy
+			
+			HostMarker = L.marker([lat, long])
+			HostCircle = L.circle([lat, long], {radius: accuracy})
+			
+			var HostGroup = L.featureGroup([HostMarker, HostCircle]).addTo(map)
+			map.fitBounds(HostGroup.getBounds())
+		}
+		
+		function graph(lat, long, accuracy){
+			if(GPSMarker && GPSCircle){
+				map.removeLayer(GPSMarker)
+				map.removeLayer(GPSCircle)
+			}
+			
+			GPSMarker = L.marker([lat, long])
+			GPSCircle = L.circle([lat, long], {radius: accuracy})
+			
+			GPSGroup = L.featureGroup([GPSMarker, GPSCircle]).addTo(map)
+		}
+		
+		function findGPS(){
+			map.fitBounds(GPSGroup.getBounds())
+		}
+	</script>
+	
+
+</html>
